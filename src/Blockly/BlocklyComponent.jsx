@@ -39,13 +39,17 @@ function BlocklyComponent(props) {
 
   const generateCode = () => {
     var code = javascriptGenerator.workspaceToCode(primaryWorkspace.current);
-    console.log(code);
+    let results = code.match(/{([^}]+)}/g);
+    results.forEach(function(entry) {
+      console.log(entry);
+    });
   };
 
   useEffect(() => {
     const {initialXml, children, ...rest} = props;
     primaryWorkspace.current = Blockly.inject(blocklyDiv.current, {
       toolbox: toolbox.current,
+      maxInstances: {'start': 1},
       ...rest,
     });
 
