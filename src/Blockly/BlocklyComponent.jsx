@@ -30,7 +30,13 @@ import {javascriptGenerator} from 'blockly/javascript';
 import locale from 'blockly/msg/en';
 import 'blockly/blocks';
 
+import play_button from './play_button.png';
+
 Blockly.setLocale(locale);
+
+
+export var workspace;
+export var randomValue = 5;
 
 function BlocklyComponent(props) {
   const blocklyDiv = useRef();
@@ -61,9 +67,11 @@ function BlocklyComponent(props) {
     }
   }, [primaryWorkspace, toolbox, blocklyDiv, props]);
 
+  workspace = primaryWorkspace;
+  randomValue = 10;
+  
   return (
     <React.Fragment>
-      <button onClick={generateCode}>Convert</button>
       <div ref={blocklyDiv} id="blocklyDiv" />
       <div style={{display: 'none'}} ref={toolbox}>
         {props.children}

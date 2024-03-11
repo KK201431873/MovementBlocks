@@ -37,7 +37,6 @@ function App(props) {
   return (
     <div className="App">
       <header className="App-header">
-        <font color="white">{display}</font>
         <BlocklyComponent
           readOnly={false}
           trashcan={true}
@@ -66,6 +65,10 @@ function App(props) {
 
           <Block type="left" />
           <Block type="right" />
+          
+          <Block type="do" />
+          <Block type="mother" />
+          <Block type="Bosswars"/>
 
         </BlocklyComponent>
       </header>

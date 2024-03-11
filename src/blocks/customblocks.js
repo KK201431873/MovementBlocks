@@ -28,7 +28,6 @@ import * as Blockly from 'blockly/core';
 
 // Since we're using json to initialize the field, we'll need to import it.
 import '../fields/BlocklyReactField';
-import '../fields/DateField';
 import play_button from './play_button.png';
 
 import '@blockly/field-date';
@@ -273,6 +272,48 @@ Blockly.Blocks['close_claws'] = {
     this.setColour(80);
  this.setTooltip("Close both of the claws.");
  this.setHelpUrl("");
+  }
+};
+
+
+
+Blockly.Blocks['do'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("do\n")
+    this.appendStatementInput("NAME")
+        .setCheck(null);
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(65);
+ this.setTooltip("do the following.");
+ this.setHelpUrl("");
+  }
+};
+
+Blockly.Blocks['mother'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("harry's mother gotem");
+    this.setInputsInline(true);
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(80);
+ this.setTooltip("more like harry's father.");
+ this.setHelpUrl("");
+  }
+};
+
+Blockly.Blocks['Bosswars'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("Commence Boss Wars");
+    this.setInputsInline(true);
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(80);
+ this.setTooltip("Makes the world a better place");
+ this.setHelpUrl("truly amazing");
   }
 };
 
