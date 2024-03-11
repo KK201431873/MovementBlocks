@@ -1,68 +1,122 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# FTC Dashboard
 
-## Available Scripts
+FTC Dashboard provides telemetry and monitoring tools for FTC robots during operation with the following features:
 
-In the project directory, you can run:
+- Live telemetry with plots and field graphics
+- Live configuration variables
+- Camera streaming
+- Limited op mode controls and gamepad support
+  - Note: Gamepad support is volatile due to unstable browser APIs
+- Custom dashboard layouts
+- Telemetry CSV export
 
-### `npm start`
+Check out our [online documentation](https://acmerobotics.github.io/ftc-dashboard).
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+|       Screenshot of custom layout        |          Screenshot with theme           |
+| :--------------------------------------: | :--------------------------------------: |
+| ![](docs/images/readme-screenshot-2.jpg) | ![](docs/images/readme-screenshot-1.jpg) |
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+# Installation
 
-### `npm test`
+## Basic
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. Open [`build.dependencies.gradle`](https://github.com/FIRST-Tech-Challenge/FtcRobotController/blob/master/build.dependencies.gradle)
+2. In the `repositories` section, add `maven { url = 'https://maven.brott.dev/' }`
+3. In the `dependencies` section, add `implementation 'com.acmerobotics.dashboard:dashboard:0.4.15'`
 
-### `npm run build`
+    Please see [GitHub releases page](https://github.com/acmerobotics/ftc-dashboard/releases) for the latest version number
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+4. If you’re using OpenRC or have non-standard SDK dependencies, add the following exclusion:
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+    ```
+    implementation('com.acmerobotics.dashboard:dashboard:0.4.15') {
+      exclude group: 'org.firstinspires.ftc'
+    }
+    ```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+# Development
 
-### `npm run eject`
+## Installation
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+1. Install Node.js
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+   - Note: Node.js 16+ is required for builds to work on M1 MacBooks
+   - Current Node version used in gradle builds can be found in [FtcDashboard/build.gradle](https://github.com/acmerobotics/ftc-dashboard/blob/master/FtcDashboard/build.gradle#L33)
+   - Node version is `18.12.1` as of time of writing
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+2. Install Yarn
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+   - Not explicitly required and provides little advantage over modern `npm` (as of the time of writing)
+   - Further instructions will however reference `yarn` over `npm` for historical reasons
 
-## Learn More
+3. Browser FTC Dashboard client is located in `FtcDashboard/dash`
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+4. Run `yarn` (alternatively `npm install`) to install dependencies
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+   - This only need be done once
 
-### Code Splitting
+5. Optionally, specify the server IP address through the environment variable `VITE_REACT_APP_HOST`
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+   - Details on Vite's environment variables can be found [here](https://vitejs.dev/guide/env-and-mode.html)
 
-### Analyzing the Bundle Size
+   - Default IPs:
+     - Android Phone: `192.168.49.1`
+     - Control Hub: `192.168.43.1`
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+6. Run `yarn dev` (alternatively `npm run dev`) to start the development server
 
-### Making a Progressive Web App
+   - This will start a development server on [`http://localhost:3000`](http://localhost:3000) by default
+   - Navigate to this address in your browser to view the dashboard client
+   - The development server will automatically reload when changes are made to the source code
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+## Mock server
 
-### Advanced Configuration
+To test without an FTC app, run the mock server located at `DashboardCore/src/test/java/com/acmerobotics/dashboard/TestServer.java`.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+- Mock server is a simple Java server hosting mock FTC op modes
+- A test sample op mode can be found at [`TestSineWaveOpMode.java`](https://github.com/acmerobotics/ftc-dashboard/blob/master/DashboardCore/src/test/java/com/acmerobotics/dashboard/TestSineWaveOpMode.java)
+- Test op modes are registered in [`TestOpModeManager.java`](https://github.com/acmerobotics/ftc-dashboard/blob/8ac8b29257dede5f4a13c440fe6756efc270cbb8/DashboardCore/src/test/java/com/acmerobotics/dashboard/testopmode/TestOpModeManager.java#L10)
 
-### Deployment
+# Basic Architecture
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+## Java Server
 
-### `npm run build` fails to minify
+Dashboard's server is split into two packages, `DashboardCore` and `FtcDashboard`
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+- [Dashboard Core](https://github.com/acmerobotics/ftc-dashboard/tree/master/DashboardCore/src/main/java/com/acmerobotics/dashboard)
+  - A standalone library that can be used to create a dashboard server for any Java application
+- [FtcDashboard](https://github.com/acmerobotics/ftc-dashboard/tree/master/FtcDashboard/src/main/java/com/acmerobotics/dashboard)
+  - A wrapper around `DashboardCore` that provides relevant tooling and hooks for FTC teams
+  - Contains the API FTC teams will access and manipulate through their own code
+  - This package also contains the browser client source
+
+## Browser Client
+
+Primary interface as a web-client acessible to the end-user through a web browser
+
+- Located in [`FtcDashboard/dash`](https://github.com/acmerobotics/ftc-dashboard/tree/master/FtcDashboard/dash)
+- Installation and run instructions mentioned above
+- TypeScript + React application
+- Vite for builds
+- Web Socket connection to the dashboard server
+
+### Relevant files
+
+- [Dashboard.tsx](https://github.com/acmerobotics/ftc-dashboard/blob/master/FtcDashboard/dash/src/components/Dashboard/Dashboard.tsx)
+  - Primary functional entrypoint
+- [LayoutPreset.tsx](https://github.com/acmerobotics/ftc-dashboard/blob/master/FtcDashboard/dash/src/enums/LayoutPreset.tsx)
+  - Contains preset layouts
+- [`views/`](https://github.com/acmerobotics/ftc-dashboard/tree/master/FtcDashboard/dash/src/components/views)
+  - Contains the various views that can be displayed on the dashboard
+    - Graphs
+    - Telemetry
+    - Gamepad
+    - etc
+- [`store/`](https://github.com/acmerobotics/ftc-dashboard/tree/master/FtcDashboard/dash/src/store)
+  - Contains shared state management logic
+    - Web Socket connection
+    - Gamepad state management
+    - Storage middleware
+    - etc
+- Views subscribe to websocket updates via the Redux store
+  - Basic example can be found in the [`TelemetryView`](https://github.com/acmerobotics/ftc-dashboard/blob/8ac8b29257dede5f4a13c440fe6756efc270cbb8/FtcDashboard/dash/src/components/views/TelemetryView.tsx#L21) component
